@@ -6,7 +6,7 @@ from PIL import Image
 
 #import libraries for movement and asynchronous behavior
 import asyncio
-from cozmo.util import degrees, distance_mm
+from cozmo.util import degrees, distance_mm, speed_mmps
 
 #import these libraries when needed for threads
 import _thread
@@ -51,7 +51,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
   
 	#have the user tap each of the cubes, in order
 	try:
-		robot.say_text("Tap the red cube and make me say something.").wait_for_completed()
+		robot.say_text("Tap the red cube to make me move.").wait_for_completed()
 		cube1.wait_for_tap(timeout=10)
 	except asyncio.TimeoutError:
 		robot.say_text("The red cube was not tapped").wait_for_completed()
@@ -59,7 +59,8 @@ def cozmo_program(robot: cozmo.robot.Robot):
 	finally:
 		cube1.set_lights_off()
 		if (success):
-			robot.say_text("Thank you for your service.").wait_for_completed()
+			robot.go_to_object(cube1, distance_mm(20.0)).wait_for_completed()
+			robot.drive_straight(distance_mm(-100.0), speed_mmps(150)).wait_for_completed()
 		else:
 			robot.say_text("You didn't tap the cube properly.").wait_for_completed()
 		success = True
@@ -105,7 +106,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
 		cube = robot.world.wait_for_observed_light_cube()
 		
 		if (success):
-			robot.say_text("Well done! I will pop a wheelie.").wait_for_completed()
+			robot.play_anim("anim_cozmosays_badword_01").wait_for_completed()
 		else:
 			robot.say_text("Do you know how to tap a cube? I will pop a wheelie.").wait_for_completed()
 		success = True	
@@ -113,7 +114,7 @@ def cozmo_program(robot: cozmo.robot.Robot):
 		action = robot.pop_a_wheelie(cube, num_retries=2)
 		action.wait_for_completed()
 		
-	robot.say_text("This is awkward.  I didn't think this through.  Help me.").wait_for_completed()
+	robot.say_text("I treat my body right. Help me.").wait_for_completed()
 	
 	return
 
